@@ -1,0 +1,25 @@
+[project]
+name = "nld-img-heat-map"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+
+dependencies = [
+    "asyncpgsa>=0.27.1",
+    "dependency-injector>=4.48.1",
+    "fastapi>=0.115.14",
+    "loguru>=0.7.3",
+    "opencv-python>=4.11.0.86",
+    "orjson>=3.10.18",
+    "python-mf-data>=0.2.6",
+]
+
+[dependency-groups]
+dev = [
+    "coverage>=7.9.1",
+    "mypy>=1.16.1",
+    "pre-commit>=4.2.0",
+    "pytest>=8.4.1",
+    "ruff>=0.12.1",
+]
