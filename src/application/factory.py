@@ -30,8 +30,12 @@ async def lifespan(app: FastAPI):
     await db.disconnect()
 
 
-app = FastAPI(default_response_class=ORJSONResponse, lifespan=lifespan)
+app = FastAPI(
+    default_response_class=ORJSONResponse,
+    lifespan=lifespan,
+    debug=FASTAPI_SETTINGS['debug']
+)
 app.container = container
-
 app.add_middleware(EventHandlerMiddleware)
+
 init_error_handler(app, FASTAPI_SETTINGS['sysadmin_email'])
