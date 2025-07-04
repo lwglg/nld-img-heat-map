@@ -9,12 +9,14 @@ on:
       - "docs/*"
       - "refactor/*"
       - "develop"
+      - "main"
   push:
     branches:
       - "feature/*"
       - "bugfix/*"
       - "docs/*"
       - "refactor/*"
+      - "main"
 
 jobs:
   # static-analysis:
