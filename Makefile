@@ -33,17 +33,43 @@ HELP_FUN = \
 		header \
 		format \
 		lint \
-		test
+		test \
+		listsrvs \
+		build \
+		confirm \
+		clean \
+		destroy \
+		logs \
+		restart \
+		start \
+		init \
+		status \
+		stop \
+		up \
+		run \
+		exec \
+		ps \
+		imganalysisci \
+		imganalysisui
 
 .DEFAULT_GOAL := help
 
 info: header
 
+# Constrói o comando do Docker Compose, dados o ambiente e os argumentos necessários
+define compose_cmd
+	@$(eval ENV := $(strip $(1)))
+	@$(eval ARGS := $(strip $(2)))
+	@echo "call_compose_cmd @ [ENV($(ENV))] & [ARGS($(ARGS))]"
+	@echo "---------------------------------------------------------------------------------------------"
+	@docker compose -f $(ROOT_DIR)/$(shell ./scripts/docker-compose.sh yamlpath $(ENV)) $(ARGS)
+endef
+
 define HEADER
 +---------------------------------------------------------------------------------------------+
-  _  _ _    ___          ___            _  _          _   __  __               _   ___ ___ 
+  _  _ _    ___          ___            _  _          _   __  __               _   ___ ___
  | \| | |  |   \   ___  |_ _|_ __  __ _| || |___ __ _| |_|  \/  |__ _ _ __    /_\ | _ \_ _|
- | .` | |__| |) | |___|  | || '  \/ _` | __ / -_) _` |  _| |\/| / _` | '_ \  / _ \|  _/| | 
+ | .` | |__| |) | |___|  | || '  \/ _` | __ / -_) _` |  _| |\/| / _` | '_ \  / _ \|  _/| |
  |_|\_|____|___/        |___|_|_|_\__, |_||_\___\__,_|\__|_|  |_\__,_| .__/ /_/ \_\_| |___|
                                   |___/                              |_|
 +---------------------------------------------------------------------------------------------+
@@ -67,3 +93,57 @@ lint: ## Realiza o linting do código-fonte em Python.
 
 test: ## Executa os testes automatizados via pytest, gerando relatório de cobertura.
 	@$(UV_RUN) ./scripts/test.sh
+
+listsrvs: ## Lista todos os nomes de serviços declarados no YAML do Docker Compose, dado um env=<dev | prod> ambiente de infra
+	$(call compose_cmd, $(env), config --services)
+
+build: ## Realiza a build de todas as imagens Docker, ou para um c=<node de serviço> específico, dado um env=<dev | prod> ambiente de infra
+	$(call compose_cmd, $(env), build $(c))
+
+confirm:
+	@( read -p "$(RED)Tem certeza? [y/N]$(RESET): " sure && case "$$sure" in [sSyY]) true;; *) false;; esac )
+
+clean: confirm ## Realiza a limpeza de todos os dados associados aos conteineres, dado um env=<dev | prod> ambiente de infra
+	$(call compose_cmd, $(env), down)
+
+destroy: confirm ## Remove todas as imagens, volumes, networks e conteineres não utilizados. Use com cautela!
+	@docker system prune --all --volumes --force
+	@docker volume prune --all --force
+	@docker network prune --force
+	@docker image prune --all --force
+
+logs: ## Adiciona captura de logs para todos os conteineres ou para um c=<nome de serviço>, dado um env=<dev | prod> ambiente de infra
+	$(call compose_cmd, $(env), logs --follow $(c))
+
+restart: ## Reinicia todos os conteineres ou apenas um c=<nome de serviço>, dado um env=<dev | prod> ambiente de infra
+	$(call compose_cmd, $(env), stop $(c))
+	@make init c=$(c)
+
+start: ## Inicia todos os conteineres em background (detached mode) ou apenas um c=<nome de serviço>, dado um env=<dev | prod> ambiente de infra
+	$(call compose_cmd, $(env), up -d $(c))
+
+init: ## Inicia um conteiner em detached mode, com captura de logs, dado um env=<dev | prod> ambiente de infra
+	@make start env=$(env) c=$(c) && make logs env=$(env) c=$(c)
+
+status: ## Lista os status dos conteineres em execução, dado um env=<dev | prod> ambiente de infra
+	$(call compose_cmd, $(env), ps)
+
+stop: ## Encerra a execução de todos os conteineres ou de apenas um c=<nome de serviço>, dado um env=<dev | prod> ambiente de infra
+	$(call compose_cmd, $(env), stop $(c))
+
+up: ## Inicia todos os conteineres em modo "attached" ou apenas um c=<nome de serviço>, dado um env=<dev | prod> ambiente de infra
+	$(call compose_cmd, $(env), up $(c))
+
+run: ## Roda um comando (o que seria especificado em 'CMD' na imagem), dado um c=<nome de serviço> e um env=<dev | prod> ambiente de infra
+	$(call compose_cmd, $(env), run --rm $(c) $(cmd))
+
+exec: ## Executa um comando em um container já iniciado, dado um c=<nome de serviço> e um s=<script> e um env=<dev | prod> ambiente de infra
+	$(call compose_cmd, $(env), exec -it $(c) $(s))
+
+ps: status ## Alias do comando 'status'
+
+imganalysisui: ## Executa a análise de uma imagem Docker, em modo UI, dado uma img=<imagem Docker>
+	@./scripts/docker-analysis.sh ui $(img)
+
+imganalysisci: ## Executa a análise de uma imagem Docker, em modo CI, dado uma img=<imagem Docker>
+	@./scripts/docker-analysis.sh ci $(img)
