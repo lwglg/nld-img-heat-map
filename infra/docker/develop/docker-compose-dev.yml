@@ -1,0 +1,53 @@
+version: '3.9'
+
+services:
+  app:
+    image: lwglg/nld-img-heat-map-api:latest
+    container_name: nld-img-heat-map-api
+    build:
+      context: ../../..
+      dockerfile: ./infra/docker/develop/app/Dockerfile
+    privileged: true
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '5'
+    ports:
+      - "8000:8000"
+    volumes:
+      - '/etc/timezone:/etc/timezone:ro'
+      - '/etc/localtime:/etc/localtime:ro'
+      - ./src:/usr/local/lwglg/nld-img-heat-map/src
+    env_file:
+      - ./app/.app.env
+    restart: always
+    networks:
+      - default-net
+
+  database:
+    container_name: nld-img-heat-map-db
+    image: lwglg/nld-img-heat-map-db:latest
+    build:
+      context: ../../..
+      dockerfile: ./infra/docker/develop/database/Dockerfile
+      args:
+        - TZ=America/Sao_Paulo
+    env_file:
+      - ./app/.app.env
+      - ./database/.database.env
+    volumes:
+      - pgsql-data:/var/lib/pgsql/pgdata
+      - '/etc/timezone:/etc/timezone:ro'
+      - '/etc/localtime:/etc/localtime:ro'
+    ports:
+      - "5000:5000"
+    networks:
+      - default-net
+
+networks:
+  default-net:
+    driver: bridge
+
+volumes:
+  pgsql-data:
