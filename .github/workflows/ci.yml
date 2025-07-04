@@ -1,0 +1,79 @@
+name: CI Pipeline
+
+on:
+  pull_request:
+    types: [opened, reopened]
+    branches:
+      - "feature/*"
+      - "bugfix/*"
+      - "docs/*"
+      - "refactor/*"
+      - "develop"
+  push:
+    branches:
+      - "feature/*"
+      - "bugfix/*"
+      - "docs/*"
+      - "refactor/*"
+
+jobs:
+  # static-analysis:
+  #   name: Static analysis and build of the source code
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     matrix:
+  #       node-version: [23.x]
+  #       # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Use Node.js ${{ matrix.node-version }}
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: ${{ matrix.node-version }}
+  #         cache: 'npm'
+  #     # Install node_modules
+  #     - run: yarn install --frozen-lockfile
+  #     # Run code formatting
+  #     - run: yarn format
+  #     # Run code linting
+  #     - run: yarn lint:check
+  #     # Run unit tests on ./src/core
+  #     - run: yarn test:core
+  #     # Run build
+  #     - run: yarn build
+
+  dive-analysis-dev:
+    name: Analysis of the Docker images for development environment.
+    runs-on: ubuntu-latest
+    env:
+      DIVE_VERSION: "0.13.1"
+      COMPOSE_YML: "${{ github.workspace }}/infra/docker/develop/docker-compose-dev.yml"
+
+    steps:
+      - uses: actions/checkout@v4.2.2
+
+      - name: Build image for the FastAPI web service
+        timeout-minutes: 10
+        run: |
+          docker compose -f $COMPOSE_YML build app
+
+      - name: Build image for the PostgreSQL web service
+        timeout-minutes: 10
+        run: |
+          docker compose -f $COMPOSE_YML build database
+
+      - name: Perform image analysis for the FastAPI web service
+        timeout-minutes: 2
+        env:
+          CI: "true"
+        run: |
+          wget -qO- "https://github.com/wagoodman/dive/releases/download/v${DIVE_VERSION}/dive_${DIVE_VERSION}_linux_amd64.tar.gz" | sudo tar xvz -C /usr/local/bin
+          dive --ci-config "${{ github.workspace }}/.dive-ci.yaml" lwglg/nld-img-heat-map-api:latest
+
+      - name: Perform image analysis for the PostgreSQL web service
+        timeout-minutes: 2
+        env:
+          CI: "true"
+        run: |
+          wget -qO- "https://github.com/wagoodman/dive/releases/download/v${DIVE_VERSION}/dive_${DIVE_VERSION}_linux_amd64.tar.gz" | sudo tar xvz -C /usr/local/bin
+          dive --ci-config "${{ github.workspace }}/.dive-ci.yaml" lwglg/nld-img-heat-map-db:latest
