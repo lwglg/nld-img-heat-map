@@ -1,5 +1,5 @@
 from pydantic import ConfigDict
-from pydantic.fields import ModelField
+from pydantic.v1.fields import ModelField
 
 
 class ConStr(str):

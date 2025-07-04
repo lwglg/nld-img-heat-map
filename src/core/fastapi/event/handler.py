@@ -5,9 +5,14 @@ from typing import Optional, NoReturn
 
 from pydantic import BaseModel
 
-from common.protocols.event import BaseEvent
-from core.fastapi.event.exception import (InvalidEventTypeException, InvalidParameterTypeException,
-                                          EmptyContextException, ParameterCountException, RequiredParameterException)
+from src.common.protocols.event import BaseEvent
+from src.core.fastapi.event.exception import (
+    InvalidEventTypeException,
+    InvalidParameterTypeException,
+    EmptyContextException,
+    ParameterCountException,
+    RequiredParameterException
+)
 
 _handler_context: ContextVar[Optional, "EventHandler"] = ContextVar("_handler_context", default=None)
 
@@ -24,10 +29,12 @@ class EventHandlerValidator:
 
         signature = inspect.signature(event.handle)
         func_parameters = signature.parameters
+
         if len(func_parameters) != self.EVENT_PARAMETER_COUNT:
             raise ParameterCountException
 
         base_parameter = func_parameters.get("param")
+
         if base_parameter.default is not None and not param:
             raise RequiredParameterException(
                 cls_name=base_parameter.__class__.__name__,
