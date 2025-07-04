@@ -1,18 +1,22 @@
 [project]
 name = "nld-img-heat-map"
 version = "0.1.0"
-description = "Add your description here"
+description = "Web service that provides a RESTful API for image analysis." 
 readme = "README.md"
 requires-python = ">=3.12"
+authors =[
+    { name = "Guilherme Gonçalves (lwglg)", email = "lwglguilherme@gmail.com" },
+]
 
 dependencies = [
     "asyncpgsa>=0.27.1",
-    "dependency-injector>=4.48.1",
+    "dependency-injector[yaml]>=4.48.1",
     "fastapi>=0.115.14",
     "loguru>=0.7.3",
     "opencv-python>=4.11.0.86",
     "orjson>=3.10.18",
-    "python-mf-data>=0.2.6",
+    "python-mf-data[rdb]>=0.2.6",
+    "uvicorn[standard]>=0.35.0",
 ]
 
 [dependency-groups]
