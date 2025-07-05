@@ -11,10 +11,11 @@ authors =[
 dependencies = [
     "asyncpgsa>=0.27.1",
     "dependency-injector[yaml]>=4.48.1",
-    "fastapi>=0.115.14",
+    "fastapi==0.111.0",
     "loguru>=0.7.3",
     "opencv-python>=4.11.0.86",
     "orjson>=3.10.18",
+    "pydantic[email]>=2.11.7",
     "python-mf-data[rdb]>=0.2.6",
     "uvicorn[standard]>=0.35.0",
 ]
