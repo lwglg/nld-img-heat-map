@@ -1,3 +1,7 @@
 from fastapi import APIRouter
 
-router = APIRouter(prefix='/imganalysis')
+
+router = APIRouter(
+    prefix="/imganalysis",
+    tags=["image-analysis"]
+)

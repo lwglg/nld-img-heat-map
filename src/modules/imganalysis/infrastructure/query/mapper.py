@@ -1,6 +1,7 @@
 from pymfdata.rdb.mapper import mapper_registry
 
-from persistence.imganalysis.entity import ImageHeatMapEntity
+from src.persistence.imganalysis.entity import ImageHeatMapEntity
+
 from .dto import ImageHeatMapDTO
 
 

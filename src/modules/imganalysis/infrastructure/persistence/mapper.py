@@ -1,9 +1,10 @@
 from dataclasses import asdict
+from pydantic import NonNegativeInt
 from pymfdata.rdb.mapper import mapper_registry
 
-from common.protocols.model_mapper import ModelMapper
-from src.modules.imganalysis.domain.aggregate.model import ImageHeatMap, ImageHeatMapId, TrackingId
-from persistence.imganalysis.entity import ImageHeatMapEntity
+from src.common.protocols.model_mapper import ModelMapper
+from src.modules.imganalysis.domain.aggregate.model import ImageHeatMap, ImageHeatMapId
+from src.persistence.imganalysis.entity import ImageHeatMapEntity
 
 
 class ImageHeatMapMapper(ModelMapper[ImageHeatMap, ImageHeatMapEntity]):
@@ -11,7 +12,7 @@ class ImageHeatMapMapper(ModelMapper[ImageHeatMap, ImageHeatMapEntity]):
     def map_to_domain_entity(model: ImageHeatMapEntity) -> ImageHeatMap:
         return ImageHeatMap(
             id=ImageHeatMapId(model.id),
-            tracking_id=TrackingId(model.tracking_id),
+            tracking_id=NonNegativeInt(model.tracking_id),
             x_min_bb=model.x_min_bb,
             y_min_bb=model.y_min_bb,
             x_max_bb=model.x_max_bb,

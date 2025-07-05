@@ -1,13 +1,12 @@
-from pydantic import ConfigDict, BaseModel, Field
+from pydantic import ConfigDict, BaseModel, Field, NonNegativeInt
 
-from src.modules.imganalysis.domain.aggregate.id import TrackingId
 from src.modules.imganalysis.domain.value_objects import Object, Region
 
 
 class NewImageHeatMapCommand(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    tracking_id: TrackingId = Field(title="TRACKING-ID", description="Non-negative integer, uniquely identifying the tracking of an object")
+    tracking_id: NonNegativeInt = Field(title="TRACKING-ID", description="Non-negative integer, uniquely identifying the tracking of an object")
     x_min_bb: float = Field(title="X-MIN-BB", description="Bounding box lower left X coordinate")
     y_min_bb: float = Field(title="X-MAX-BB", description="Bounding box lower left Y coordinate")
     x_max_bb: float = Field(title="Y-MIN-BB", description="Bounding box upper right X coordinate")
