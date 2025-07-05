@@ -50,7 +50,8 @@ HELP_FUN = \
 		exec \
 		ps \
 		imganalysisci \
-		imganalysisui
+		imganalysisui \
+		topology
 
 .DEFAULT_GOAL := help
 
@@ -147,3 +148,6 @@ imganalysisui: ## Executa a análise de uma imagem Docker, em modo UI, dado uma 
 
 imganalysisci: ## Executa a análise de uma imagem Docker, em modo CI, dado uma img=<imagem Docker>
 	@./scripts/docker-analysis.sh ci $(img)
+
+topology: ## Gera um diagrama dos serviços listados no arquivo YML do Docker Compose
+	@./scripts/generate-topology.sh topology $(env)
