@@ -3,7 +3,7 @@ from sqlalchemy import Column, BigInteger, Integer, String, Float
 
 
 class ImageHeatMapEntity(Base):
-    __tablename__ = 'image_heat_map'
+    __tablename__ = "image_heat_map"
     FP_PRECISION = 4
 
     id: int | Column = Column(BigInteger, primary_key=True)
