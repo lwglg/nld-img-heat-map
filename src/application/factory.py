@@ -5,15 +5,18 @@ from fastapi import FastAPI
 from contextlib import _AsyncGeneratorContextManager, asynccontextmanager
 from sqlalchemy.orm import clear_mappers
 
-from src.core.fastapi.error import init_error_handler
+from src.core.fastapi.error import init_error_handlers
 from src.core.fastapi.event.middleware import EventHandlerMiddleware
 from src.core.fastapi.responses import ORJSONResponse
 from src.core.fastapi.routes import add_routes
 from src.modules.imganalysis.usecase import router as img_analysis_router
 from src.modules.imganalysis.usecase.new_heat_map import api as new_heat_map_api
+from src.modules.imganalysis.infrastructure.persistence import mapper as img_analysis_persistence_mapper
+from src.modules.imganalysis.infrastructure.query import mapper as img_analysis_query_mapper
 
 from .container import Container, DeclarativeContainer, AsyncSQLAlchemy
 from .settings import WEBSERVICE_SETTINGS
+
 
 def build_di_container() -> tuple[DeclarativeContainer, AsyncSQLAlchemy]:
     """Build the dependency injection container and DB instances for the application."""
@@ -38,6 +41,9 @@ def build_context_manager(db: AsyncSQLAlchemy) -> Callable[[FastAPI,], _AsyncGen
         await db.connect(echo=True)
         await db.create_database()
 
+        img_analysis_persistence_mapper.start_mapper()
+        img_analysis_query_mapper.start_mapper()
+
         yield
 
         # Shutdown logic
@@ -56,14 +62,13 @@ class ApplicationFactory:
         self.app: FastAPI | None = None
 
     def build_application(self, db_instance: AsyncSQLAlchemy, di_container: DeclarativeContainer) -> ApplicationFactory:
-        if self.app is not None:
-            self.app = FastAPI(
-                default_response_class=ORJSONResponse,
-                lifespan=build_context_manager(db_instance),
-                debug=WEBSERVICE_SETTINGS['debug']
-            )
+        self.app = FastAPI(
+            default_response_class=ORJSONResponse,
+            lifespan=build_context_manager(db_instance),
+            debug=WEBSERVICE_SETTINGS.debug
+        )
 
-            self.app.container = di_container
+        self.app.container = di_container
 
         return self
 
@@ -76,7 +81,7 @@ class ApplicationFactory:
     def apply_middlewares(self) -> ApplicationFactory:
         if self.app is not None:
             self.app.add_middleware(EventHandlerMiddleware)
-            init_error_handler(self.app, WEBSERVICE_SETTINGS['sysadmin_email'])
+            init_error_handlers(self.app, WEBSERVICE_SETTINGS.sysadmin_email)
 
         return self
 

@@ -1,6 +1,6 @@
-from typing import TypedDict, Required
-from pydantic import EmailStr
 from os import getenv
+
+from pydantic import BaseModel, EmailStr
 
 from src.common.utils.parsing import to_boolean
 
@@ -11,21 +11,21 @@ __all__ = [
 ]
 
 
-class DatabaseSettings(TypedDict):
-    db_engine: Required[str]
-    db_name: Required[str]
-    username: Required[str]
-    password: Required[str]
-    hostname: Required[str]
-    port: Required[int]
+class DatabaseSettings(BaseModel):
+    db_engine: str
+    db_name: str
+    username: str
+    password: str
+    hostname: str
+    port: int
 
 
-class FastAPISettings(TypedDict):
+class FastAPISettings(BaseModel):
     debug: bool
-    port: Required[int]
+    port: int
     sysadmin_email: EmailStr
-    log_level: Required[str]
-    host: Required[str]
+    log_level: str
+    host: str
 
 
 DB_SETTINGS = DatabaseSettings(
@@ -34,7 +34,7 @@ DB_SETTINGS = DatabaseSettings(
     username=getenv("DB_USERNAME", "postgres"),
     password=getenv("DB_PASSWORD", "postgres"),
     hostname=getenv("DB_HOSTNAME", "127.0.0.1"),
-    port=int(getenv("DB_PORT", 5432))
+    port=getenv("DB_PORT", 5432)
 )
 
 

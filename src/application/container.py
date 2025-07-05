@@ -1,5 +1,7 @@
+from loguru import logger
+from urllib.parse import quote_plus
 from dependency_injector.containers import DeclarativeContainer
-from dependency_injector.providers import Factory, Singleton
+from dependency_injector.providers import Factory, Resource, Singleton
 from pymfdata.rdb.connection import AsyncSQLAlchemy
 
 from .settings import DB_SETTINGS
@@ -10,15 +12,10 @@ from src.modules.imganalysis.usecase.new_heat_map.impl import NewImageHeatMapUse
 
 
 class Container(DeclarativeContainer):
-    db_conn_str = '{engine}://{username}:{password}@{host}:{port}/{db_name}'.format(
-        engine=DB_SETTINGS["db_engine"],
-        username=DB_SETTINGS['username'],
-        password=DB_SETTINGS['password'],
-        host=DB_SETTINGS['hostname'],
-        port=DB_SETTINGS['port'],
-        db_name=DB_SETTINGS['db_name'],
-    )
+    logging = Resource(logger)
 
+    # Database client for PostgreSQL
+    db_conn_str = f'{DB_SETTINGS.db_engine}://{DB_SETTINGS.username}:{quote_plus(DB_SETTINGS.password)}@{DB_SETTINGS.hostname}:{DB_SETTINGS.port}/{DB_SETTINGS.db_name}'
     db = Singleton(AsyncSQLAlchemy, db_uri=db_conn_str)
 
     # Units Of Work
