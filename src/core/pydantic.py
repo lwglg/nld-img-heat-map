@@ -11,7 +11,7 @@ class ConStr(str):
         yield cls.validate
 
     @classmethod
-    def validate(cls, value: str, field: ModelField, config: ConfigDict):
+    def validate(cls, value: str, config: ConfigDict):
         if not isinstance(value, str):
             raise TypeError('This value is only str')
 
