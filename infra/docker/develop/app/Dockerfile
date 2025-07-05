@@ -1,34 +1,30 @@
-FROM python:3.12-slim-bookworm
+FROM python:3.12-slim
 
-# The installer requires curl (and certificates) to download the release archive
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-        curl \
-        ca-certificates \
-        ffmpeg \
-        libsm6 \
-        libxext6
+# Installing uv
+COPY --from=ghcr.io/astral-sh/uv:0.6.1 /uv /uvx /bin/
 
-# Download the latest installer
-ADD https://astral.sh/uv/install.sh /uv-installer.sh
-
-# Run the installer then remove it
-RUN sh /uv-installer.sh && rm /uv-installer.sh
-
-# Ensure the installed binary is on the `PATH`
-ENV PATH="/root/.local/bin/:$PATH"
-
+# Change the working directory to the "nld-img-heat-map" directory
 WORKDIR /usr/local/lwglg/nld-img-heat-map
 
-# Copy the necessary project files
+# Installing dependencies
 COPY ./.python-version ./.python-version
-COPY ./pyproject.toml ./pyproject.toml
-COPY ./uv.lock ./uv.lock
-COPY ./src ./src
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync --locked --no-install-project
 
-# Sync the project into a new environment, installing only non-dev packages, using the frozen lockfile
-RUN uv sync --frozen --no-dev
+# Copy the project into the image
+COPY ./src ./src
+COPY ./pytest.ini ./pytest.ini
+COPY ./ruff.toml ./ruff.toml
+COPY ./.dive-ci.yaml ./.dive-ci.yaml
+COPY ./.dive-ui.yaml ./.dive-ui.yaml
+
+# Sync the project
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    uv sync --locked
 
 # Application startup command
 CMD [ "uv", "run", "python", "-m", "src" ]
-
