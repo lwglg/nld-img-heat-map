@@ -1,4 +1,4 @@
-FROM postgres:12-alpine
+FROM postgres:16-alpine
 
 # Set timezone
 ARG TZ

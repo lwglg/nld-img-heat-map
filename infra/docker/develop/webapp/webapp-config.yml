@@ -1,0 +1,32 @@
+db:
+  engine: postgresql+asyncpg
+  hostname: database
+  port: 5000
+  username: sysadmin
+  password: nld@@2025
+  dbname: nld_img_analysis_db
+
+webapp:
+  debug: true
+  hostname: "0.0.0.0"
+  port: 8001
+  log_level: info
+  api:
+    root_path: api
+    version: v1
+  sysadmin:
+    email: "lwglguilherme@gmail.com"  
+
+swagger_ui:
+  api_version: "1.0.0"
+  tab_title: "NLD - Image Analysis API"
+  page_title: "NLD - Image Analysis API"
+  summary: "Interactive documentation for the RESTful API that serves tools for image analysis."
+  description: "Technical assessment for the position of back-end engineer at NoLeak Defence. The API itself was built with FastAPI, the persistence layer with SQLAlchemy, integrated with PostgreSQL database."
+  redoc_logo:
+    path: static/nld-logo.png
+    alt_text: "NLD Logo"
+    background_color": "#FFFFFF"
+    href: "https://www.noleakdefence.com/?lang=en"
+    width: "600px"
+    height: "600px"

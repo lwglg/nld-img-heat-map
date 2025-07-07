@@ -1,25 +1,29 @@
 version: '3.9'
 
 services:
-  app:
-    image: lwglg/nld-img-heat-map-api:latest
-    container_name: nld-img-heat-map-api
+  webapp:
+    image: lwglg/nld-img-heat-map-webapp:latest
+    container_name: nld-img-heat-map-webapp
     build:
       context: ../../..
-      dockerfile: ./infra/docker/develop/app/Dockerfile
+      dockerfile: ./infra/docker/develop/webapp/Dockerfile
     privileged: true
     logging:
       driver: 'json-file'
       options:
         max-size: '10m'
         max-file: '5'
+    command: [ "python", "-m", "webapp.main" ]
     ports:
-      - "8000:8000"
+      - "8001:8001"
     volumes:
       - '/etc/timezone:/etc/timezone:ro'
       - '/etc/localtime:/etc/localtime:ro'
+      - ../../../webapp:/usr/local/nld-img-heat-map/webapp
+      - ../../../resources/static:/usr/local/nld-img-heat-map/static
+      - './webapp/webapp-config.yml:/usr/local/nld-img-heat-map/webapp-config.yml'
     env_file:
-      - ./app/.app.env
+      - ./webapp/.webapp.env
     restart: always
     networks:
       - default-net
@@ -33,7 +37,6 @@ services:
       args:
         - TZ=America/Sao_Paulo
     env_file:
-      - ./app/.app.env
       - ./database/.database.env
     volumes:
       - pgsql-data:/var/lib/pgsql/pgdata
