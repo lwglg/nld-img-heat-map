@@ -186,3 +186,4 @@ make clean env=[dev | prod]         # Opcional. Remove os contêineres e a netwo
 ## 1.5. O que deseja fazer?
 
 - [Voltar para TOC](#11-toc)
+- [Utilização da API](./API_USAGE.md)
