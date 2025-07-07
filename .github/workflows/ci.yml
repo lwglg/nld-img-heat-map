@@ -20,7 +20,7 @@ on:
 
 jobs:
   static-analysis:
-    name: python
+    name: Source Code Analysis
     runs-on: ubuntu-latest
 
     steps:
