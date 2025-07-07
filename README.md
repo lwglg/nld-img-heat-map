@@ -1,4 +1,4 @@
-# nld-img-heat-map
+# NLD :: Image Analysis API
 
 Technical assessment for the position of back-end software engineer at NoLeak Defence.
 
