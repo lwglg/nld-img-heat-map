@@ -1,4 +1,4 @@
-# 1. NLD :: Image Analysis API :: Utilizaçãod da API [WiP]
+# 1. NLD :: Image Analysis API :: Utilização da API [WiP]
 
 ## 1.1. TOC
 
