@@ -1,5 +1,14 @@
 FROM python:3.12-slim
 
+# Installing dependencies
+RUN --mount=type=cache,target=/var/cache/apt \
+    --mount=type=cache,target=/var/lib/apt \
+    apt-get update \
+    && apt-get install -y \
+        ffmpeg \
+        libsm6 \
+        libxext6
+
 # Installing uv
 COPY --from=ghcr.io/astral-sh/uv:0.6.1 /uv /uvx /bin/
 

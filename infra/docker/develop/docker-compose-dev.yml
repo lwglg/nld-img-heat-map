@@ -21,6 +21,7 @@ services:
       - '/etc/localtime:/etc/localtime:ro'
       - ../../../webapp:/usr/local/nld-img-heat-map/webapp
       - ../../../resources/static:/usr/local/nld-img-heat-map/static
+      - ../../../img_analysis_data:/usr/local/nld-img-heat-map/img_analysis_data
       - './webapp/webapp-config.yml:/usr/local/nld-img-heat-map/webapp-config.yml'
     env_file:
       - ./webapp/.webapp.env
