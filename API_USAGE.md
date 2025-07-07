@@ -15,7 +15,7 @@
 ## 1.2. Preliminares
 
 > [!IMPORTANT]
-> - A documentação da API RESTful é acessível pelo endereço [`http://localhost:8001/api/docs`](`http://localhost:8001/api/docs`), via browser, após o container do web service ter sido devidamente iniciado;
+> - A documentação da API RESTful é acessível pelo endereço [`http://localhost:8001/api/docs`](http://localhost:8001/api/docs), via browser, após o container do web service ter sido devidamente iniciado;
 > - Para efeitos de teste, existem criadas uma collection e environment no Postman. Os arquivos podem ser importados e se encontram na pasta `resources/testing`.
 
 ## 1.3. Casos de uso [WiP]
