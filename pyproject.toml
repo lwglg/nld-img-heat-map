@@ -10,21 +10,22 @@ authors =[
 
 dependencies = [
     "asyncpgsa>=0.27.1",
-    "dependency-injector[yaml]>=4.48.1",
-    "fastapi==0.111.0",
+    "dependency-injector>=4.48.1",
+    "fastapi>=0.115.14",
     "loguru>=0.7.3",
-    "opencv-python>=4.11.0.86",
-    "orjson>=3.10.18",
+    "passlib[bcrypt]>=1.7.4",
     "pydantic[email]>=2.11.7",
-    "python-mf-data[rdb]>=0.2.6",
-    "uvicorn[standard]>=0.35.0",
+    "pyyaml>=6.0.2",
+    "swagger-ui-py>=25.7.1",
+    "types-passlib>=1.7.7.20250602",
+    "uvicorn>=0.35.0",
 ]
 
 [dependency-groups]
 dev = [
-    "coverage>=7.9.1",
+    "coverage>=7.9.2",
     "mypy>=1.16.1",
     "pre-commit>=4.2.0",
     "pytest>=8.4.1",
-    "ruff>=0.12.1",
+    "ruff>=0.12.2",
 ]
