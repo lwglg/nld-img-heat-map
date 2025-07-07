@@ -19,31 +19,22 @@ on:
       - "main"
 
 jobs:
-  # static-analysis:
-  #   name: Static analysis and build of the source code
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     matrix:
-  #       node-version: [23.x]
-  #       # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - name: Use Node.js ${{ matrix.node-version }}
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: ${{ matrix.node-version }}
-  #         cache: 'npm'
-  #     # Install node_modules
-  #     - run: yarn install --frozen-lockfile
-  #     # Run code formatting
-  #     - run: yarn format
-  #     # Run code linting
-  #     - run: yarn lint:check
-  #     # Run unit tests on ./src/core
-  #     - run: yarn test:core
-  #     # Run build
-  #     - run: yarn build
+  static-analysis:
+    name: python
+    runs-on: ubuntu-latest
 
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+      - name: "Set up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: "pyproject.toml"
+      - name: Install the project
+        run: uv sync --locked --all-extras --dev
+      - name: Run tests with pytest
+        run: make test
   dive-analysis-dev:
     name: Analysis of the Docker images for development environment.
     runs-on: ubuntu-latest
@@ -57,7 +48,7 @@ jobs:
       - name: Build image for the FastAPI web service
         timeout-minutes: 10
         run: |
-          docker compose -f $COMPOSE_YML build app
+          docker compose -f $COMPOSE_YML build webapp
 
       - name: Build image for the PostgreSQL web service
         timeout-minutes: 10
@@ -70,7 +61,7 @@ jobs:
           CI: "true"
         run: |
           wget -qO- "https://github.com/wagoodman/dive/releases/download/v${DIVE_VERSION}/dive_${DIVE_VERSION}_linux_amd64.tar.gz" | sudo tar xvz -C /usr/local/bin
-          dive --ci-config "${{ github.workspace }}/.dive-ci.yaml" lwglg/nld-img-heat-map-api:latest
+          dive --ci-config "${{ github.workspace }}/.dive-ci.yaml" lwglg/nld-img-heat-map-webapp:latest
 
       - name: Perform image analysis for the PostgreSQL web service
         timeout-minutes: 2
