@@ -59,7 +59,7 @@ class ImageAnalysis(UUID4PKMixin, Base):
     # Text data
     object_label = Column(String, nullable=False)
     region_label = Column(String, nullable=False)
-    image_url = Column(String, nullable=False)
+    image_path = Column(String, nullable=False)
 
     # Timestamps
     created_at = Column(DateTime, default=func.now())

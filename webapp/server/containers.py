@@ -36,5 +36,6 @@ class Container(DeclarativeContainer):
         ImageAnalysisRepository, session_factory=db.provided.session
     )
     img_analysis_service = Factory(
-        ImageAnalysisService, users_repository=img_analysis_repository
+        ImageAnalysisService,
+        img_analysis_repository=img_analysis_repository,
     )

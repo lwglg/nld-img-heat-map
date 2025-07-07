@@ -1,3 +1,6 @@
+from collections.abc import Generator
+
+
 __all__ = [
     "SUPPORTED_TRUE_SYMBOLS",
     "SUPPORTED_FALSE_SYMBOLS",
@@ -60,3 +63,18 @@ def to_boolean(value: TSupportedTypes) -> bool | None:
             return None
 
     return None
+
+
+def is_empty_no_side_effects(generator: Generator) -> tuple[Generator, bool]:
+    """Check if generator is empty without consuming any elements from it."""
+
+    try:
+        item = next(generator)
+
+        def my_generator():
+            yield item
+            yield from generator
+
+        return my_generator(), False
+    except StopIteration:
+        return (_ for _ in []), True

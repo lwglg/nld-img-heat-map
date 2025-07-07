@@ -1,9 +1,9 @@
-from datetime import datetime
 from uuid import uuid4
 
 from pydantic import BaseModel, Field, UUID4
 
 from webapp.core.fastapi.responses import create_data_model
+from webapp.modules.img_analysis.domain.attributes import ImageAnalysisType
 
 
 class ImageAnalysisCreationSchema(BaseModel):
@@ -14,7 +14,7 @@ class ImageAnalysisCreationSchema(BaseModel):
     y_max_bb: float
     object_label: str
     region_label: str
-    image_url: str
+    image_path: str
 
 
 class ImageAnalysisUpdateSchema(BaseModel):
@@ -27,7 +27,8 @@ class ImageAnalysisUpdateSchema(BaseModel):
     y_centroid_bb: float | None = None
     object_label: str | None = None
     region_label: str | None = None
-    image_url: str | None = None
+    image_path: str | None = None
+    analysis_type: ImageAnalysisType = ImageAnalysisType.UNDEFINED.value
 
 
 class ImageAnalysisDetailSchema(BaseModel):
@@ -41,9 +42,15 @@ class ImageAnalysisDetailSchema(BaseModel):
     y_centroid_bb: float
     object_label: str
     region_label: str
-    image_url: str
-    created_at: datetime
-    updated_at: datetime
+    image_path: str
+    analysis_type: ImageAnalysisType
+
+
+class ImageAnalysisRequestBodySchema(BaseModel):
+    image_file_google_drive_id: str
+    json_file_google_drive_id: str
+    object_label: str
+    analysis_type: ImageAnalysisType = ImageAnalysisType.UNDEFINED.value
 
 
 ImageAnalysisDetail = create_data_model(

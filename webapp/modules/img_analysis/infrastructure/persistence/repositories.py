@@ -24,7 +24,7 @@ class ImageAnalysisRepository:
         existing_analysis = result.scalar()
 
         if not existing_analysis:
-            raise NotFoundException(f'ImageAnalysis with ID "{analysis_id}" not found')
+            raise NotFoundException(f'Image analysis with ID "{analysis_id}" not found')
 
         return existing_analysis
 
@@ -33,6 +33,15 @@ class ImageAnalysisRepository:
             existing_analysis = await self._get_analysis_by_uuid(s, analysis_id)
 
             return existing_analysis
+
+    async def delete_by_id(self, analysis_id: str):
+        async with self._session() as s:
+            await self._get_analysis_by_uuid(s, analysis_id)
+
+            stmt = delete(ImageAnalysis).where(ImageAnalysis.id == analysis_id)
+
+            await s.execute(stmt)
+            await s.commit()
 
     async def get_all_analysis(self):
         async with self._session() as s:
@@ -51,11 +60,11 @@ class ImageAnalysisRepository:
 
             return created_analysis
 
-    async def delete_by_id(self, analysis_id: str):
+    async def add_analysis_bulk(self, payload: list[ImageAnalysisCreationSchema]):
         async with self._session() as s:
-            await self._get_analysis_by_uuid(s, analysis_id)
+            batch_to_insert = [item.model_dump() for item in payload]
 
-            stmt = delete(ImageAnalysis).where(ImageAnalysis.id == analysis_id)
-
-            await s.execute(stmt)
+            await s.run_sync(lambda ses: ses.bulk_insert_mappings(ImageAnalysis, batch_to_insert))
             await s.commit()
+
+            return [ImageAnalysis(**item) for item in batch_to_insert]

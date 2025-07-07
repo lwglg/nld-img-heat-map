@@ -7,15 +7,15 @@ from webapp.modules.img_analysis.infrastructure.persistence.services import (
     ImageAnalysisService,
 )
 from webapp.modules.img_analysis.domain.schemas.img_analysis import (
-    ImageAnalysisCreationSchema,
     ImageAnalysisDetail,
     ImageAnalysisDetails,
+    ImageAnalysisRequestBodySchema,
 )
 
 from . import img_analysis_router as router
 
 
-@router.get("", response_model=GenericResponse[ImageAnalysisDetails])
+@router.get("/", response_model=GenericResponse[ImageAnalysisDetails])
 @inject
 async def list_analysis(
     img_analysis_service: ImageAnalysisService = Depends(
@@ -23,7 +23,7 @@ async def list_analysis(
     ),
 ):
     """Retrieve a list of analysis."""
-    analysis = await img_analysis_service.get_analysis()
+    analysis = await img_analysis_service.list_analysis()
     return {"status": status.HTTP_200_OK, "data": {"analysis": analysis}}
 
 
@@ -40,16 +40,16 @@ async def get_by_id(
     return {"status": status.HTTP_200_OK, "data": {"analysis": analysis}}
 
 
-@router.post("", response_model=GenericResponse[ImageAnalysisDetail])
+@router.post("/", response_model=GenericResponse[ImageAnalysisDetails])
 @inject
-async def create_analysis(
-    payload: ImageAnalysisCreationSchema,
+async def create_img_bounding_boxes(
+    payload: ImageAnalysisRequestBodySchema,
     img_analysis_service: ImageAnalysisService = Depends(
         Provide[Container.img_analysis_service]
     ),
 ):
     """Create a new analysis, given a valid payload."""
-    analysis = await img_analysis_service.create_analysis(payload)
+    analysis = await img_analysis_service.create_img_bounding_boxes(payload)
     return {"status": status.HTTP_201_CREATED, "data": {"analysis": analysis}}
 
 
