@@ -40,7 +40,7 @@ class ImageAnalysisService:
         json_file_id = payload.json_file_google_drive_id
         img_file_id = payload.image_file_google_drive_id
         object_label = payload.object_label
-        analysis_type=payload.analysis_type
+        analysis_type = payload.analysis_type
 
         # Perform the download of both JSON and PNG files
         fr_service.perform_download(
@@ -63,6 +63,8 @@ class ImageAnalysisService:
             ip_service.draw_bounding_boxes(img_file_id, img_data, tracking_messages)
 
             # Save the generated bounding boxes into a single analysis batch for the same time
-            analysis_records = await self.repository.add_analysis_bulk(tracking_messages)
+            analysis_records = await self.repository.add_analysis_bulk(
+                tracking_messages
+            )
 
             return analysis_records

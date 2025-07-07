@@ -64,7 +64,9 @@ class ImageAnalysisRepository:
         async with self._session() as s:
             batch_to_insert = [item.model_dump() for item in payload]
 
-            await s.run_sync(lambda ses: ses.bulk_insert_mappings(ImageAnalysis, batch_to_insert))
+            await s.run_sync(
+                lambda ses: ses.bulk_insert_mappings(ImageAnalysis, batch_to_insert)
+            )
             await s.commit()
 
             return [ImageAnalysis(**item) for item in batch_to_insert]

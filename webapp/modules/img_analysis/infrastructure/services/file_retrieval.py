@@ -46,14 +46,19 @@ def save_response_content(
 
 
 async def perform_download(
-    files_to_download: list[tuple[str, str]], input_folder_path: str = INPUT_FOLDER_PATH, file_paths: list[str] = []
+    files_to_download: list[tuple[str, str]],
+    input_folder_path: str = INPUT_FOLDER_PATH,
+    file_paths: list[str] = [],
 ) -> None:
     """Perform file download, given a valid file ID."""
 
     for file_id, file_ext in files_to_download:
         # Multiplex between folders for JSON (Elasticsearch query dump) and PNG files
-        destination_folder = f"{input_folder_path}/elasticsearch" \
-            if file_ext == "json" else f"{input_folder_path}/images"
+        destination_folder = (
+            f"{input_folder_path}/elasticsearch"
+            if file_ext == "json"
+            else f"{input_folder_path}/images"
+        )
 
         os.makedirs(destination_folder, exist_ok=True)
 
