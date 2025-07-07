@@ -1,5 +1,5 @@
 #!/bin/sh -e
 set -x
 
-ruff check src scripts --fix --unsafe-fixes
-ruff format src scripts
+ruff check webapp scripts --fix --unsafe-fixes
+ruff format webapp scripts
