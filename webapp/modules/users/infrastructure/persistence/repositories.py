@@ -7,6 +7,7 @@ from webapp.common.utils.security import Password
 from webapp.core.fastapi.exceptions.classes import NotFoundException
 from webapp.modules.users.domain.models import User
 from webapp.modules.users.domain.schemas import UserCreationSchema, UserUpdateSchema
+from webapp.modules.users.infrastructure.api.filters import UserFilter
 
 
 class UserRepository:
@@ -31,9 +32,11 @@ class UserRepository:
 
             return existing_user
 
-    async def get_all_users(self):
+    async def list_users(self, user_filter: UserFilter):
         async with self._session() as s:
-            result = await s.execute(select(User))
+            query = select(User)
+            query = user_filter.filter(query)
+            result = await s.execute(query)
             users = result.scalars().all()
 
             return users

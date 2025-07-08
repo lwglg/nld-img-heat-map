@@ -29,7 +29,7 @@ class Container(DeclarativeContainer):
 
     # Users domain
     users_repository = Factory(UserRepository, session_factory=db.provided.session)
-    user_service = Factory(UserService, users_repository=users_repository)
+    user_service = Factory(UserService, repository=users_repository)
 
     # Image analysis domain
     img_analysis_repository = Factory(
@@ -37,5 +37,5 @@ class Container(DeclarativeContainer):
     )
     img_analysis_service = Factory(
         ImageAnalysisService,
-        img_analysis_repository=img_analysis_repository,
+        repository=img_analysis_repository,
     )

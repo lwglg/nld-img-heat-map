@@ -1,4 +1,5 @@
 from fastapi import Depends, status
+from fastapi_filter import FilterDepends
 from dependency_injector.wiring import inject, Provide
 
 from webapp.core.fastapi.responses import GenericResponse
@@ -12,15 +13,17 @@ from webapp.modules.users.domain.schemas import (
 )
 
 from . import users_router as router
+from .filters import UserFilter
 
 
 @router.get("", response_model=GenericResponse[UserDetails])
 @inject
 async def list_users(
+    user_filter: UserFilter = FilterDepends(UserFilter),
     user_service: UserService = Depends(Provide[Container.user_service]),
 ):
     """Retrieve a list of users."""
-    users = await user_service.get_users()
+    users = await user_service.list_users(user_filter)
     return {"status": status.HTTP_200_OK, "data": {"users": users}}
 
 
