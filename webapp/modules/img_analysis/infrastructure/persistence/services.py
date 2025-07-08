@@ -4,7 +4,6 @@ from collections.abc import Awaitable, Callable
 
 from loguru import logger
 
-from webapp.modules.img_analysis.domain.attributes import ImageAnalysisType
 from webapp.modules.img_analysis.domain.schemas.img_analysis import (
     ImageAnalysisDetailSchema,
     ImageAnalysisRequestBodySchema,
@@ -39,14 +38,6 @@ class ImageAnalysisService:
         self, analysis_id: str
     ) -> Callable[[ImageAnalysisService, int], Awaitable[None]]:
         await self.repository.delete_by_id(analysis_id)
-
-    def _multiplex_img_analysis_method(self, analysis_type: str):
-        analysis_type_method_map = {
-            ImageAnalysisType.BOUNDING_BOX.value: ip_service.draw_bounding_boxes,
-            ImageAnalysisType.HEAT_MAP.value: ip_service.generate_img_heat_map,
-        }
-
-        return analysis_type_method_map.get(analysis_type)
 
     async def _check_img_analysis_status(
         self, payload: ImageAnalysisRequestBodySchema
@@ -99,15 +90,10 @@ class ImageAnalysisService:
             json_file_id, img_file_id, object_label, analysis_type
         )
 
-        # Obtain the adequate function for the image processing, given the analysis type
-        img_analysis_func = self._multiplex_img_analysis_method(analysis_type.value)
+        ip_service.perform_image_analysis(img_file_id, tracking_messages, analysis_type)
 
-        if len(tracking_messages) > 0 and img_analysis_func:
-            # Apply whatever image processing method was requested
-            img_data = ip_service.load_image_data(img_file_id)
-            img_analysis_func(img_file_id, img_data, tracking_messages)
-
-            # Save the generated bounding boxes into a single analysis batch for the same time
+        if len(tracking_messages) > 0:
+            # Save the generated bounding boxes into a single analysis batch for the same type
             analysis_records = await self.repository.add_analysis_bulk(
                 tracking_messages
             )

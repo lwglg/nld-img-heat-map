@@ -5,6 +5,7 @@ import numpy as np
 from cv2.typing import MatLike, Scalar
 from loguru import logger
 
+from webapp.modules.img_analysis.domain.attributes import ImageAnalysisType
 from webapp.modules.img_analysis.domain.schemas.img_analysis import (
     ImageAnalysisUpdateSchema,
 )
@@ -58,11 +59,13 @@ def draw_bounding_boxes(
         lower_point = (int(msg.x_min_bb), int(msg.y_min_bb))
         upper_point = (int(msg.x_max_bb), int(msg.y_max_bb))
 
+        # Draw the bounding box
         cv2.rectangle(image_data, lower_point, upper_point, color_map, thickness)
 
         label = f"{msg.object_label}@{msg.region_label}"
         label_coords = (int(msg.x_min_bb), int(msg.y_min_bb) - 12)
 
+        # TODO: Think of someway better to label these boxes, and stop the overlapping
         cv2.putText(
             image_data,
             label,
@@ -73,6 +76,7 @@ def draw_bounding_boxes(
             thickness // 3,
         )
 
+        # Draw a circle, representing the bounding box centroid
         cv2.circle(
             image_data,
             (int(msg.x_centroid_bb), int(msg.y_centroid_bb)),
@@ -130,3 +134,23 @@ def generate_img_heat_map(
     logger.warning(f"Generating heat map on file '{output_file_path}'...")
 
     cv2.imwrite(output_file_path, overlayed_image)
+
+
+def perform_image_analysis(
+    file_id: str,
+    tracking_messages: list[ImageAnalysisUpdateSchema],
+    analysis_type: ImageAnalysisType,
+):
+    """Multiplex between the different types of analysis and performs it."""
+    analysis_type_method_map = {
+        ImageAnalysisType.BOUNDING_BOX.value: draw_bounding_boxes,
+        ImageAnalysisType.HEAT_MAP.value: generate_img_heat_map,
+    }
+
+    # Obtain the adequate function for the image processing, given the analysis type
+    img_analysis_func = analysis_type_method_map.get(analysis_type.value)
+
+    if len(tracking_messages) > 0 and img_analysis_func:
+        # Apply whatever image processing method was requested
+        img_data = load_image_data(file_id)
+        img_analysis_func(file_id, img_data, tracking_messages)
