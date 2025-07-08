@@ -86,6 +86,8 @@ def parse_tracking_msg_to_model(
     x_centroid = (x_max + x_min) / 2.0
     y_centroid = (y_max + y_min) / 2.0
 
+    output_image_path = f"{OUTPUT_FOLDER_PATH}/{analysis_type.value}/{analysis_type.value}_{object_label}_{img_file_id}.png"
+
     return ImageAnalysisUpdateSchema(
         tracking_id=tracking_id,
         x_min_bb=x_min,
@@ -94,10 +96,10 @@ def parse_tracking_msg_to_model(
         y_max_bb=y_max,
         x_centroid_bb=x_centroid,
         y_centroid_bb=y_centroid,
-        object_label=object_label.strip().lower(),
+        object_label=object_label.strip(),
         region_label=region_label.strip(),
         analysis_type=analysis_type,
-        image_path=f"{OUTPUT_FOLDER_PATH}/{analysis_type.value}/{img_file_id}_{object_label}.png",
+        image_path=output_image_path,
     )
 
 

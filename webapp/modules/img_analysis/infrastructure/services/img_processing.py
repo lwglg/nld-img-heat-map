@@ -36,7 +36,7 @@ def build_output_img_file(
     output_folder_path = f"{output_folder_path}/{analysis_type}"
     os.makedirs(output_folder_path, exist_ok=True)
 
-    return f"{output_folder_path}/{file_id}_{object_label}.png"
+    return f"{output_folder_path}/{analysis_type}_{object_label}_{file_id}.png"
 
 
 def draw_bounding_boxes(
@@ -44,7 +44,6 @@ def draw_bounding_boxes(
     image_data: MatLike,
     tracking_messages: list[ImageAnalysisUpdateSchema],
     color_map: Scalar = (0, 255, 0),
-    output_folder_path: str = OUTPUT_FOLDER_PATH,
 ):
     """Draw bounding boxes on an image, given its geometric parameters from the tracking messages."""
 
@@ -97,31 +96,30 @@ def generate_img_heat_map(
     file_id: str,
     image_data: MatLike,
     tracking_messages: list[ImageAnalysisUpdateSchema],
-    color_map: int = cv2.COLORMAP_JET,
-    output_folder_path: str = OUTPUT_FOLDER_PATH,
 ):
     """Apply heat map on incoming image data, given the bounding boxes positions."""
 
     img_height, img_width, _ = image_data.shape
-    heatmap = np.zeros(image_data.shape, dtype=np.float32)
+    heatmap_image = np.zeros((img_height, img_width, 1), np.uint8)
 
     for msg in tracking_messages:
-        x_centroid = int(msg.x_centroid_bb)
-        y_centroid = int(msg.y_centroid_bb)
+        x = int(msg.x_centroid_bb)
+        y = int(msg.y_centroid_bb)
 
-        if 0 < x_centroid < img_width and 0 < y_centroid < img_height:
-            heatmap[y_centroid, x_centroid] += 1
+        if 0 < x < img_width and 0 < y < img_height:
+            cv2.circle(heatmap_image, (x, y), 100, 255, -1)
 
-    # Normalize the heatmap
-    heatmap = cv2.normalize(
-        heatmap, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8U
+    # Apply distance transform
+    heatmap_image = cv2.distanceTransform(heatmap_image, cv2.DIST_L2, 5)
+
+    # Normalize and apply colormap
+    heatmap_image = cv2.normalize(
+        heatmap_image, None, 0, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8U
     )
+    heatmap_image = cv2.applyColorMap(heatmap_image, cv2.COLORMAP_JET)
 
-    # Apply a color map
-    heatmap = cv2.applyColorMap(heatmap, colormap=color_map)
-
-    # Overlay the heatmap on the original image
-    superimposed = cv2.addWeighted(heatmap, 0.5, image_data, 1.0, 0)
+    # Overlay the heatmap
+    overlayed_image = cv2.addWeighted(image_data, 0.7, heatmap_image, 0.3, 0)
 
     output_file_path = build_output_img_file(
         file_id,
@@ -131,4 +129,4 @@ def generate_img_heat_map(
 
     logger.warning(f"Generating heat map on file '{output_file_path}'...")
 
-    cv2.imwrite(output_file_path, superimposed)
+    cv2.imwrite(output_file_path, overlayed_image)
