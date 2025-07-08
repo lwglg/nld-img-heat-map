@@ -1,3 +1,4 @@
+from typing import Any
 from collections.abc import Generator
 
 
@@ -65,7 +66,7 @@ def to_boolean(value: TSupportedTypes) -> bool | None:
     return None
 
 
-def is_empty_no_side_effects(generator: Generator) -> tuple[Generator, bool]:
+def is_generator_empty(generator: Generator) -> tuple[Generator, bool]:
     """Check if generator is empty without consuming any elements from it."""
 
     try:
@@ -78,3 +79,17 @@ def is_empty_no_side_effects(generator: Generator) -> tuple[Generator, bool]:
         return my_generator(), False
     except StopIteration:
         return (_ for _ in []), True
+
+
+def filter_dict_by_key(json_object: dict[str, Any], target_key: str):
+    """Filter recursively a JSON by a given key."""
+
+    if isinstance(json_object, dict):
+        for key, value in json_object.items():
+            if key == target_key:
+                yield value
+
+            yield from filter_dict_by_key(value, target_key)
+    elif isinstance(json_object, list):
+        for item in json_object:
+            yield from filter_dict_by_key(item, target_key)

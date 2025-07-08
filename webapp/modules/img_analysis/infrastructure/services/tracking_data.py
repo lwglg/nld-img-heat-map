@@ -11,7 +11,7 @@ from webapp.modules.img_analysis.domain.schemas.img_analysis import (
     ImageAnalysisUpdateSchema,
 )
 from webapp.common.constants import INPUT_FOLDER_PATH, OUTPUT_FOLDER_PATH
-from webapp.common.utils.parsing import is_empty_no_side_effects
+from webapp.common.utils.parsing import is_generator_empty, filter_dict_by_key
 
 
 def load_json_from_file(
@@ -32,20 +32,6 @@ def load_json_from_file(
         return data
 
 
-def extract_values(json_object: dict[str, Any], target_key: str):
-    """Filter recursively a JSON by a given key."""
-
-    if isinstance(json_object, dict):
-        for key, value in json_object.items():
-            if key == target_key:
-                yield value
-
-            yield from extract_values(value, target_key)
-    elif isinstance(json_object, list):
-        for item in json_object:
-            yield from extract_values(item, target_key)
-
-
 def extract_tracking_data(
     json_data: dict[str, Any], tracking_data_obj_key: str = "deepstream-msg"
 ) -> list[str] | None:
@@ -53,18 +39,12 @@ def extract_tracking_data(
 
     logger.info(f"Filtering JSON data by key '{tracking_data_obj_key}'...")
 
-    filtered = extract_values(json_data, tracking_data_obj_key)
+    filtered = filter_dict_by_key(json_data, tracking_data_obj_key)
 
-    if not is_empty_no_side_effects(filtered)[1]:
+    if not is_generator_empty(filtered)[1]:
         raw_tracking_data = list(filtered)
 
         return [item for sublist in raw_tracking_data for item in sublist]
-
-
-def _filtering_task(tracking_msg: str, object_label: str) -> bool:
-    """Check if given object label is substring from message."""
-
-    return object_label.strip().lower() in tracking_msg
 
 
 def parse_tracking_msg_to_model(
@@ -103,6 +83,12 @@ def parse_tracking_msg_to_model(
     )
 
 
+def _filtering_msg_task(tracking_msg: str, object_label: str) -> bool:
+    """Check if given object label is substring from message."""
+
+    return object_label.strip().lower() in tracking_msg
+
+
 def filter_tracking_data_by_object(
     tracking_data: list[str],
     object_label: str,
@@ -114,7 +100,10 @@ def filter_tracking_data_by_object(
     if len(tracking_data) == 0:
         return tracking_data
 
-    apply_task_with_object_label = partial(_filtering_task, object_label=object_label)
+    # Inject the extra object label arg into the filtering message task callable
+    apply_task_with_object_label = partial(
+        _filtering_msg_task, object_label=object_label
+    )
 
     with ProcessPoolExecutor(max_workers=cpu_count()) as ppe:
         object_tracking_data = [
