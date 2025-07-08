@@ -29,7 +29,7 @@
 
 #### 1.3.1.1. Encadeamento lógico
 
-- A1: Os IDs para os arquivos JSON e PNG, assim como o nome do objeto e o tipo de análise (neste caso)Gather params from incoming payload;
+- A1: Os IDs para os arquivos JSON e PNG, assim como o nome do objeto e o tipo de análise são extraídos do corpo da requisição e injetados no serviço de obtenção dos arquivos de teste em núvem;
 - A2: De posse desses parâmetros, o web service então realiza o download dos arquivos de entrada (JSON e PNG), em um diretório no qual um volume foi criado, em comunicação como o container do web service;
 - A3: Com o conteúdo do JSON carregado, o web service extrai as informações de rastramento de objetos do atributo `deepstream-msg`, e realiza um parsing adequado a cada elemento da lista, de modo que cada elemento esteja apto a ser persistido no banco de dados relacional e também para que a geração das bounding boxes na imagem original seja feita com mais facilidade;
 - A4: As bounding boxes são superpostas à imagem original e um novo arquivo PNG é gerado, tendo o nome construído segundo o padrão `bounding-box_{nome_do_objeto)_{id-do-arquivo}.png`
