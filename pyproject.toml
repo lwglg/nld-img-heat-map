@@ -12,6 +12,7 @@ dependencies = [
     "asyncpgsa>=0.27.1",
     "dependency-injector>=4.48.1",
     "fastapi>=0.115.14",
+    "fastapi-filter>=2.0.1",
     "loguru>=0.7.3",
     "opencv-python>=4.11.0.86",
     "pandas>=2.3.0",
