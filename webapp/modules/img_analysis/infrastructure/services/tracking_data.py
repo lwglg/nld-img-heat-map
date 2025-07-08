@@ -7,11 +7,10 @@ from typing import Any
 
 from loguru import logger
 
-from webapp.modules.img_analysis.domain.attributes import ImageAnalysisType
 from webapp.modules.img_analysis.domain.schemas.img_analysis import (
     ImageAnalysisUpdateSchema,
 )
-from webapp.common.constants import INPUT_FOLDER_PATH
+from webapp.common.constants import INPUT_FOLDER_PATH, OUTPUT_FOLDER_PATH
 from webapp.common.utils.parsing import is_empty_no_side_effects
 
 
@@ -70,7 +69,7 @@ def _filtering_task(tracking_msg: str, object_label: str) -> bool:
 
 def parse_tracking_msg_to_model(
     tracking_msg: str,
-    analysis_type: ImageAnalysisType,
+    analysis_type: str,
     img_file_id: str,
     separator: str = "|",
 ) -> ImageAnalysisUpdateSchema:
@@ -98,14 +97,14 @@ def parse_tracking_msg_to_model(
         object_label=object_label.strip().lower(),
         region_label=region_label.strip(),
         analysis_type=analysis_type,
-        image_path=f"{INPUT_FOLDER_PATH}/images/{img_file_id}.png",
+        image_path=f"{OUTPUT_FOLDER_PATH}/{analysis_type.value}/{img_file_id}_{object_label}.png",
     )
 
 
 def filter_tracking_data_by_object(
     tracking_data: list[str],
     object_label: str,
-    analysis_type: ImageAnalysisType,
+    analysis_type: str,
     img_file_id: str,
 ) -> list[ImageAnalysisUpdateSchema] | None:
     """Filter all tracking messages by an object label."""
@@ -117,11 +116,29 @@ def filter_tracking_data_by_object(
 
     with ProcessPoolExecutor(max_workers=cpu_count()) as ppe:
         object_tracking_data = [
-            parse_tracking_msg_to_model(tmsg, analysis_type.value, img_file_id)
+            parse_tracking_msg_to_model(tmsg, analysis_type, img_file_id)
             for tmsg, is_from_object in zip(
                 tracking_data, ppe.map(apply_task_with_object_label, tracking_data)
             )
             if is_from_object
         ]
 
+    logger.warning(len(object_tracking_data))
+
     return object_tracking_data
+
+
+def obtain_tracking_messages(
+    json_file_id: str, img_file_id: str, object_label: str, analysis_type: str
+):
+    """Combine all necessary actions in order to extract the tracking messages for an object."""
+
+    json_data = load_json_from_file(json_file_id)
+
+    tracking_data = extract_tracking_data(json_data)
+
+    tracking_messages = filter_tracking_data_by_object(
+        tracking_data, object_label, analysis_type, img_file_id
+    )
+
+    return tracking_messages

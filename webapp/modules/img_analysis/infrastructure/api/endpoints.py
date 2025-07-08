@@ -1,4 +1,5 @@
 from fastapi import Depends, status
+from fastapi_filter import FilterDepends
 from dependency_injector.wiring import inject, Provide
 
 from webapp.core.fastapi.responses import GenericResponse
@@ -12,18 +13,21 @@ from webapp.modules.img_analysis.domain.schemas.img_analysis import (
     ImageAnalysisRequestBodySchema,
 )
 
+
 from . import img_analysis_router as router
+from .filters import ImageAnalysisFilter
 
 
 @router.get("/", response_model=GenericResponse[ImageAnalysisDetails])
 @inject
 async def list_analysis(
+    analysis_filter: ImageAnalysisFilter = FilterDepends(ImageAnalysisFilter),
     img_analysis_service: ImageAnalysisService = Depends(
         Provide[Container.img_analysis_service]
     ),
 ):
     """Retrieve a list of analysis."""
-    analysis = await img_analysis_service.list_analysis()
+    analysis = await img_analysis_service.list_analysis(analysis_filter)
     return {"status": status.HTTP_200_OK, "data": {"analysis": analysis}}
 
 
@@ -42,14 +46,14 @@ async def get_by_id(
 
 @router.post("/", response_model=GenericResponse[ImageAnalysisDetails])
 @inject
-async def create_img_bounding_boxes(
+async def apply_image_analysis(
     payload: ImageAnalysisRequestBodySchema,
     img_analysis_service: ImageAnalysisService = Depends(
         Provide[Container.img_analysis_service]
     ),
 ):
     """Create a new analysis, given a valid payload."""
-    analysis = await img_analysis_service.create_img_bounding_boxes(payload)
+    analysis = await img_analysis_service.apply_image_analysis(payload)
     return {"status": status.HTTP_201_CREATED, "data": {"analysis": analysis}}
 
 

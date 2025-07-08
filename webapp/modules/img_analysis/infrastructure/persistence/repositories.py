@@ -3,6 +3,7 @@ from collections.abc import Awaitable
 from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from webapp.modules.img_analysis.infrastructure.api.filters import ImageAnalysisFilter
 from webapp.core.fastapi.exceptions.classes import NotFoundException
 from webapp.modules.img_analysis.domain.models import ImageAnalysis
 from webapp.modules.img_analysis.domain.schemas.img_analysis import (
@@ -43,9 +44,12 @@ class ImageAnalysisRepository:
             await s.execute(stmt)
             await s.commit()
 
-    async def get_all_analysis(self):
+    async def list_analysis(self, analysis_filter: ImageAnalysisFilter):
         async with self._session() as s:
-            result = await s.execute(select(ImageAnalysis))
+            query = select(ImageAnalysis)
+            query = analysis_filter.filter(query)
+            result = await s.execute(query)
+
             analysis = result.scalars().all()
 
             return analysis

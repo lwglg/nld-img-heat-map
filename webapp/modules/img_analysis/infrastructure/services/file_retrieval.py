@@ -3,6 +3,7 @@ import requests
 
 from loguru import logger
 
+
 from webapp.common.constants import INPUT_FOLDER_PATH, GOOGLE_DOCS_URL, FILE_CHUNK_SIZE
 
 
@@ -64,6 +65,7 @@ async def perform_download(
 
         destination_path = f"{destination_folder}/{file_id}.{file_ext}"
 
+        # If the file already exists, continue to the next one
         if os.path.exists(destination_path):
             continue
 
