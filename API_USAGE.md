@@ -139,15 +139,14 @@ img_analysis_data/                                                             #
         └── ...
 ```
 
-Para efeito de ilustração, abaixo é mostrao, lado a lado, as imagens geradas usando os arquivos de teste fornecidos, para o objeto `person`:
-
+Abaixo são mostradas as imagens geradas usando os arquivos de teste fornecidos, gerando bounding boxes e mapa de calor para o objeto `person`:
 
 <div style="display:flex">
   <div style="flex:1;padding-right:10px;">
-    <img src="resources/docs/images/bounding-box_person_1GXHYrpLb6nyO1tryCXrz2twNPqU3yH3B.png" width="800"/>
+    <img src="resources/docs/images/bounding-box_person_1GXHYrpLb6nyO1tryCXrz2twNPqU3yH3B.png" width="700"/>
   </div>
   <div style="flex:1;padding-left:10px;">
-    <img src="resources/docs/images/heat-map_person_1GXHYrpLb6nyO1tryCXrz2twNPqU3yH3B.png" width="800"/>
+    <img src="resources/docs/images/heat-map_person_1GXHYrpLb6nyO1tryCXrz2twNPqU3yH3B.png" width="700"/>
   </div>
 </div>
 
