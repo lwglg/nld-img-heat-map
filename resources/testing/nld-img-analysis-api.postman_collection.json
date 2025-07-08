@@ -86,7 +86,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://{{wsHostname}}:{{wsPort}}/{{wsApiPrefix}}/{{wsApiUsersEndpoint}}",
+							"raw": "http://{{wsHostname}}:{{wsPort}}/{{wsApiPrefix}}/{{wsApiUsersEndpoint}}?email=foo3@email.com&is_active=true",
 							"protocol": "http",
 							"host": [
 								"{{wsHostname}}"
@@ -95,6 +95,16 @@
 							"path": [
 								"{{wsApiPrefix}}",
 								"{{wsApiUsersEndpoint}}"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "foo3@email.com"
+								},
+								{
+									"key": "is_active",
+									"value": "true"
+								}
 							]
 						}
 					},
@@ -163,7 +173,7 @@
 			"name": "img-analysis",
 			"item": [
 				{
-					"name": "create-bounding-boxes",
+					"name": "create-heat-map",
 					"request": {
 						"auth": {
 							"type": "noauth"
@@ -172,7 +182,40 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"json_file_google_drive_id\": \"1_rgKrCgHvnfYfg3jD0bpMK9eIB5Dymjy\",\n    \"image_file_google_drive_id\": \"1GXHYrpLb6nyO1tryCXrz2twNPqU3yH3B\",\n    \"object_label\": \"chair\",\n    \"analysis_type\": \"bounding-box\"\n}\n",
+							"raw": "{\n    \"json_file_google_drive_id\": \"1_rgKrCgHvnfYfg3jD0bpMK9eIB5Dymjy\",\n    \"image_file_google_drive_id\": \"1GXHYrpLb6nyO1tryCXrz2twNPqU3yH3B\",\n    \"object_label\": \"person\",\n    \"analysis_type\": \"heat-map\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{wsHostname}}:{{wsPort}}/{{wsApiPrefix}}/{{wsApiImgAnalysisEndpoint}}/",
+							"protocol": "http",
+							"host": [
+								"{{wsHostname}}"
+							],
+							"port": "{{wsPort}}",
+							"path": [
+								"{{wsApiPrefix}}",
+								"{{wsApiImgAnalysisEndpoint}}",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create-boundary-box",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"json_file_google_drive_id\": \"1_rgKrCgHvnfYfg3jD0bpMK9eIB5Dymjy\",\n    \"image_file_google_drive_id\": \"1GXHYrpLb6nyO1tryCXrz2twNPqU3yH3B\",\n    \"object_label\": \"person\",\n    \"analysis_type\": \"bounding-box\"\n}\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -222,7 +265,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://{{wsHostname}}:{{wsPort}}/{{wsApiPrefix}}/{{wsApiImgAnalysisEndpoint}}/",
+							"raw": "http://{{wsHostname}}:{{wsPort}}/{{wsApiPrefix}}/{{wsApiImgAnalysisEndpoint}}/?analysis_type__in=bounding-box",
 							"protocol": "http",
 							"host": [
 								"{{wsHostname}}"
@@ -232,6 +275,27 @@
 								"{{wsApiPrefix}}",
 								"{{wsApiImgAnalysisEndpoint}}",
 								""
+							],
+							"query": [
+								{
+									"key": "analysis_type__in",
+									"value": "bounding-box"
+								},
+								{
+									"key": "image_path__ilike",
+									"value": "1GXHYrpLb6nyO1tryCXrz2twNPqU3yH3B",
+									"disabled": true
+								},
+								{
+									"key": "region_label__ilike",
+									"value": "NO_AREA",
+									"disabled": true
+								},
+								{
+									"key": "object_label__ilike",
+									"value": "person",
+									"disabled": true
+								}
 							]
 						}
 					},
