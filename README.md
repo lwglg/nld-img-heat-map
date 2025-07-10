@@ -113,12 +113,18 @@ O ambiente de desenvolvimento, construído nesse repositório, foi pensado de fo
 Abaixo uma representação diagramática dessa estrutura.
 
 <details>
-<summary>Topologia do projeto - DEV</summary>
+<summary>Mostrar diagrama da topologia</summary>
 
 ![Topologia do projeto - DEV](./resources/docs/images/docker-topology-develop.png)
 
 </details>
 
+> [!NOTE]
+> Esse diagrama foi gerado com o [`docker-compose-viz`](https://github.com/pmsipilot/docker-compose-viz), que é um gerador de grafos direcionados, que recebe como entrada o manifesto YML do Docker Compose para os serviços em questão. Para gerar ou atualizar o diagrama acima, basta executar:
+> 
+> ```bash
+> make topology
+> ```
 
 Segue abaixo uma listagem das assinaturas de URL, para as diferentes redes:
 
