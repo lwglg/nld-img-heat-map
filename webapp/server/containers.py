@@ -10,8 +10,6 @@ from webapp.modules.img_analysis.infrastructure.persistence.repositories import 
 from webapp.modules.img_analysis.infrastructure.persistence.services import (
     ImageAnalysisService,
 )
-from webapp.modules.users.infrastructure.persistence.repositories import UserRepository
-from webapp.modules.users.infrastructure.persistence.services import UserService
 
 
 class Container(DeclarativeContainer):
@@ -26,10 +24,6 @@ class Container(DeclarativeContainer):
     config.from_yaml(config_yaml_path)
 
     db = Singleton(Database, db_uri=Database.build_db_connection_string(config))
-
-    # Users domain
-    users_repository = Factory(UserRepository, session_factory=db.provided.session)
-    user_service = Factory(UserService, repository=users_repository)
 
     # Image analysis domain
     img_analysis_repository = Factory(
